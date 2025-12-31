@@ -2,11 +2,25 @@ pipeline {
   agent any
   
   stages {
-    stage('Hello Jenkins') {
+
+    stage('Checkout Source') {
       steps {
-        echo 'Hello, Jenkins pipeline is running!'
-        sh 'pwd'
-        sh 'ls -la'
+        checkout scm
+      }
+    }
+    
+    stage('Build Docker Image') {
+      steps {
+        sh '''
+        echo "=== Source Code ==="
+        ls -la
+
+        echo "=== Build Docker Image ==="
+        docker build -t jenkins-devops-app .
+
+        echo "=== Docker Images ==="
+        docker images
+        '''
       }
     }
   }
