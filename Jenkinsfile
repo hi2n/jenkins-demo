@@ -25,7 +25,7 @@ pipeline {
 
           docker run -d \
             --name devops-app \
-            -p 8080:80 \
+            -p 8081:80 \
             jenkins-devops-app:latest
         '''
       }
