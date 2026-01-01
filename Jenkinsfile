@@ -12,14 +12,21 @@ pipeline {
     stage('Build Docker Image') {
       steps {
         sh '''
-        echo "=== Source Code ==="
-        ls -la
+          docker build -t jenkins-devops-app:latest .
+        '''
+      }
+    }
+    
+    stage('Deploy Container') {
+      steps {
+        sh '''
+          docker stop devops-app || true
+          docker rm devops-app || true
 
-        echo "=== Build Docker Image ==="
-        docker build -t jenkins-devops-app .
-
-        echo "=== Docker Images ==="
-        docker images
+          docker run -d \
+            --name devops-app \
+            -p 8080:80 \
+            jenkins-devops-app:latest
         '''
       }
     }
