@@ -1,7 +1,7 @@
 pipeline {
   agent any
     
-  enviroment {
+  environment {
       IMAGE_NAME = "jenkins-devops-app"
       IMAGE_TAG = "latest"
       DEPLOY_ENV = "staging"
