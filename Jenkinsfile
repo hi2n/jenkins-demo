@@ -1,9 +1,15 @@
 pipeline {
   agent any
+    
+  enviroment {
+      IMAGE_NAME = "jenkins-devops-app"
+      IMAGE_TAG = "latest"
+      DEPLOY_ENV = "staging"
+  }
   
   stages {
 
-    stage('Checkout Source') {
+    stage('Checkout') {
       steps {
         checkout scm
       }
@@ -11,26 +17,35 @@ pipeline {
     
     stage('Build Docker Image') {
       steps {
-        sh '''
-          docker build -t jenkins-devops-app:latest .
-        '''
+        sh 'docker build -t ${IMAGE_NAME}:${IMAGE_TAG} .'
       }
     }
     
-    stage('Deploy Container') {
+    stage('Test') {
       steps {
         sh '''
-          echo "Stop old container if exists"
-          docker stop devops-app || true
-          docker rm devops-app || true
-
-          echo "Run new container"
-          docker run -d \
-            --name devops-app \
-            -p 8081:80 \
-            jenkins-devops-app:latest
+          chmod +x test.sh
+          ./test.sh
         '''
       }
     }
+
+    stage('Deploy with Ansible') {
+      steps {
+        sh '''
+          ansible-playbook ansible/deploy.yml \
+          -i ansible/inventory \
+          --extra-vars "image_name=${IMAGE_NAME} image_tag=${IMAGE_TAG} env=${DEPLOY_ENV}"
+        '''
+      }
+    }  
   }
+    post {
+      success {
+        echo " Pipeline SUCCESS "
+      }
+      failure {
+        echo " Pipeline FAILED - DEPLOY ABORTED"
+      }
+   }
 }
