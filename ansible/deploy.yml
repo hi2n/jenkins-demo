@@ -1,0 +1,20 @@
+- name: Deploy Docker App
+  hosts: staging
+  become: true
+
+  vars:
+    container_name: devops-app
+
+  tasks:
+    - name: Stop old container
+      shell: docker stop {{ container_name }} || true
+
+    - name: Remove old container
+      shell: docker rm {{ container_name }} || true
+
+    - name: Run new container
+      shell: >
+        docker run -d
+        --name {{ container_name }}
+        -p 8081:80
+        {{ image_name }}:{{ image_tag }}

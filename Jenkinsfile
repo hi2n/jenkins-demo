@@ -33,9 +33,10 @@ pipeline {
     stage('Deploy with Ansible') {
       steps {
         sh '''
-          ansible-playbook ansible/deploy.yml \
-          -i ansible/inventory \
-          --extra-vars "image_name=${IMAGE_NAME} image_tag=${IMAGE_TAG} env=${DEPLOY_ENV}"
+          ./scripts/run-deploy.sh \
+          $IMAGE_NAME \
+          $IMAGE_TAG \
+          $DEPLOY_ENV
         '''
       }
     }  
